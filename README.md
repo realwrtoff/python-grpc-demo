@@ -4,6 +4,7 @@
 
 2. generate proto code to rpc_package
     ```bash
+    mkdir -p ./rpc_package
     python3 -m grpc_tools.protoc --proto_path=./protos --python_out=./rpc_package ./protos/common.proto
     python3 -m grpc_tools.protoc --proto_path=./protos --python_out=./rpc_package --grpc_python_out=./rpc_package ./protos/hello.proto
     ```
