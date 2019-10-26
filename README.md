@@ -14,12 +14,14 @@
    edit hello_pb2.py: 
 
    ```pyt
+   # import common_pb2 as common__pb2
    import rpc_package.common_pb2 as common__pb2
    ```
 
    edit hello_pb2_grpc.py: 
 
    ```pyt
+   # import hello_pb2 as hello__pb2
    import rpc_package.hello_pb2 as hello__pb2
    ```
 
