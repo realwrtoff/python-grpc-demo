@@ -50,15 +50,15 @@
 
 2. run grpc consul server 
     ```bash
-    python3 grpc_consul_server.py &
+    python3 grpc_consul_server.py -c 192.168.1.125 &
     # you may run multi server with different port
-    python3 grpc_consul_server.py -p 9390
-    python3 grpc_consul_server.py -p 9391 
+    python3 grpc_consul_server.py -c 192.168.1.125 -p 9390
+    python3 grpc_consul_server.py -c 192.168.1.125 -p 9391 
     # you can watch them in the consul server ui http://192.168.1.125:8500
     ```
 
 3. run grpc consul client
     ```bash
-    python3 grpc_consul_client.py
+    python3 grpc_consul_client.py  -c 192.168.1.125
     # run multi times, then you will find it request different ip port if there are multi servers.
     ```
