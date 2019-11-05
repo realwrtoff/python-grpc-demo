@@ -7,7 +7,8 @@ package rpc_package;
 // define a service
 service HelloWorldService {
     // define the interface and data type
-    rpc SayHello (HelloRequest) returns (HelloReply) {}
+    rpc SayHello (HelloRequest) returns (HelloReply) {};
+    rpc Transfer (stream BytesRequest) returns (HelloReply) {};
 }
 
 // define the data type of request
@@ -19,4 +20,10 @@ message HelloRequest {
 message HelloReply {
     ErrorCode code = 1;
     string message = 2;
+}
+
+// define the data type of request
+message BytesRequest {
+    string key = 1;
+    bytes value = 2;
 }

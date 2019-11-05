@@ -6,7 +6,8 @@ import time
 
 from concurrent import futures
 import grpc
-# import json
+import consul
+import socket
 
 from rpc_package.common_pb2 import ErrorCode
 from rpc_package.hello_pb2 import HelloReply
@@ -40,16 +41,39 @@ class Greeter(HelloWorldServiceServicer):
         return response
 
 
+def register(c, server_name, ip, port):
+    check = consul.Check.tcp(ip, port, "10s")  # 健康检查的ip，端口，检查时间
+    c.agent.service.register(server_name, f"{server_name}-{ip}-{port}",
+                             address=ip, port=port, check=check)  # 注册服务部分
+    print(f"注册服务{server_name}成功")
+
+
+def unregister(c, server_name, ip, port):
+    print(f"开始退出服务{server_name}")
+    c.agent.service.deregister(f'{server_name}-{ip}-{port}')
+
+
+def get_lan_ip():
+    return socket.gethostbyname(socket.getfqdn(socket.gethostname()))
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--ip', required=False, type=str, help="Specify host ip", default='0.0.0.0')
+    parser.add_argument('-c', '--consul', required=False, type=str, help="Specify consul host ip", default=get_lan_ip())
+    parser.add_argument('-i', '--ip', required=False, type=str, help="Specify host ip", default=get_lan_ip())
     parser.add_argument('-p', '--port', required=False, type=int, help="Specify grpc port", default=9380)
     args = parser.parse_args()
 
-    # 启动 rpc 服务
+    # 启动rpc服务
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     add_HelloWorldServiceServicer_to_server(Greeter(), server)
     server.add_insecure_port("{}:{}".format(args.ip, args.port))
+
+    # 注册consul
+    c = consul.Consul(args.consul)
+    service_name = 'grpc_trans_server'
+    register(c, service_name, args.ip, args.port)
+
     server.start()
     print('grpc server run at {}:{}'.format(args.ip, args.port))
 
@@ -57,7 +81,8 @@ def main():
         while True:
             time.sleep(60 * 60 * 24)  # one day in seconds
     except KeyboardInterrupt:
-        print('KeyboardInterrupt, exit')
+        unregister(c, service_name, args.ip, args.port)
+        print('exception killed')
         server.stop(0)
 
 

@@ -32,3 +32,30 @@
     python3 grpc_client.py
     ```
 
+# python-grpc-demo with consul
+###Steps
+1. install consul or consul cluster
+```bash
+   wget https://releases.hashicorp.com/consul/1.6.1/consul_1.6.1_linux_amd64.zip
+   unzip consul_1.6.1_linux_amd64.zip
+   mv consul /usr/local/bin/
+   # simple start
+   # nohup consul &
+   # start with params
+   consul agent -server -bootstrap-expect=3 -data-dir=/data/consul -node=consul-dev -bind=192.168.1.125 -client=0.0.0.0 -datacenter=beijing -ui
+```
+
+2. run grpc consul server 
+    ```bash
+    python3 grpc_consul_server.py &
+    # you may run multi server with different port
+    python3 grpc_consul_server.py -p 9390
+    python3 grpc_consul_server.py -p 9391 
+    # you can watch them in the consul server ui http://192.168.1.125:8500
+    ```
+
+3. run grpc consul client
+    ```bash
+    python3 grpc_consul_client.py
+    # run multi times, then you will find it request different ip port if there are multi servers.
+    ```
